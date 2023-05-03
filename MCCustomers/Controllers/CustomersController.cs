@@ -27,11 +27,33 @@ namespace MCCustomers.Controllers
                 }
 
                 Customer? customer = await Database.Customers
-                                       .Select(x => x)
-                                       .Where(x => x.Id == id)
-                                       .FirstOrDefaultAsync();
+                                     .Select(x => x)
+                                     .Where(x => x.Id == id)
+                                     .FirstOrDefaultAsync();
 
                 return Ok(customer);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        [HttpPatch]
+        public async Task<ActionResult> UpdateInfo(Customer newCustomerInfo)
+        {
+            try
+            {
+                if (Database.Customers is null)
+                {
+                    return NotFound();
+                }
+
+                Database.Customers.Update(newCustomerInfo);
+
+                await Database.SaveChangesAsync();
+
+                return Ok();
             }
             catch (Exception)
             {
