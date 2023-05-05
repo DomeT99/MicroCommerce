@@ -1,4 +1,5 @@
 ﻿using MCCustomers.Models;
+using MCCustomers.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,24 +13,25 @@ namespace MCCustomers.Controllers
 
         public CustomersController(MccustomersContext _database)
         {
-            this.Database = _database;
+            Database = _database;
         }
 
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Customer>> GetCustomer(int id)
+        public async Task<IActionResult> GetCustomer(int id)
         {
             try
             {
-                if (Database.Customers is null)
+                Customer? customer = await Database.Customers
+                                           .Select(x => x)
+                                           .Where(x => x.Id == id)
+                                           .FirstOrDefaultAsync();
+
+                if (customer == null)
                 {
-                    return NotFound();
+                    return NotFound("Customer is not found.");
                 }
 
-                Customer? customer = await Database.Customers
-                                     .Select(x => x)
-                                     .Where(x => x.Id == id)
-                                     .FirstOrDefaultAsync();
 
                 return Ok(customer);
             }
@@ -39,21 +41,26 @@ namespace MCCustomers.Controllers
             }
         }
 
-        [HttpPatch]
-        public async Task<ActionResult> UpdateInfo(Customer newCustomerInfo)
+        [HttpPatch("{id}")]
+        public async Task<ActionResult> UpdateInfo(int id, CustomerDto newCustomerInfo)
         {
             try
             {
-                if (Database.Customers is null)
-                {
-                    return NotFound();
-                }
+                Customer? customerInfo = await Database.Customers
+                                              .Select(x => x)
+                                              .Where(x => x.Id == id)
+                                              .FirstOrDefaultAsync();
 
-                Database.Customers.Update(newCustomerInfo);
+
+                customerInfo!.Name = newCustomerInfo.Name ?? customerInfo.Name;
+                customerInfo!.Surname = newCustomerInfo.Surname ?? customerInfo.Surname;
+                customerInfo!.Email = newCustomerInfo.Email ?? customerInfo.Email;
+                customerInfo!.Phone = newCustomerInfo.Phone ?? customerInfo.Phone;
+
 
                 await Database.SaveChangesAsync();
 
-                return Ok();
+                return Ok(customerInfo);
             }
             catch (Exception)
             {
