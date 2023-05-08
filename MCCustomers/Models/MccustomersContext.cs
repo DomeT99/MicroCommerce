@@ -25,7 +25,6 @@ public partial class MccustomersContext : DbContext
     {
         modelBuilder.Entity<Customer>(entity =>
         {
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Email).HasMaxLength(320);
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Phone)
