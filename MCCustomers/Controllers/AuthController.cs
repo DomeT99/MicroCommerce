@@ -1,10 +1,7 @@
-﻿using System.Security.Claims;
-using MCCustomers.Models;
+﻿using MCCustomers.Models;
 using MCCustomers.Models.Dto;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
+using MCCustomers.Utils;
 
 namespace MCCustomers.Controllers
 {
@@ -52,6 +49,8 @@ namespace MCCustomers.Controllers
         [HttpPost("login")]
         public ActionResult<string> Login(CredentialsDto credentials)
         {
+            Token token = new(_configuration);
+
             try
             {
                 var customer = Database.Customers
@@ -75,44 +74,18 @@ namespace MCCustomers.Controllers
                     return BadRequest("Wrong password.");
                 }
 
-                string token = CreateToken(customer);
+                string jsonWebToken = token.Create(customer.Email);
 
                 //var refreshToken = GenerateRefreshToken();
                 //SetRefreshToken(refreshToken);
 
-                return Ok(token);
+                return Ok(jsonWebToken);
             }
             catch (Exception)
             {
                 throw;
             }
         }
-        
-        
-        
-        private string CreateToken(Customer customer)
-        {
-            string? appSettingsToken = _configuration.GetSection("AppSettings:Token").Value;
 
-            List<Claim> claims = new()
-            {
-                new Claim(ClaimTypes.Name, customer.Email),
-                new Claim(ClaimTypes.Role, "User")
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appSettingsToken!));
-
-            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
-
-            var token = new JwtSecurityToken(
-                claims: claims,
-                expires: DateTime.Now.AddHours(1),
-                signingCredentials: credentials
-                );
-
-            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return jwt;
-        }
     }
 }
