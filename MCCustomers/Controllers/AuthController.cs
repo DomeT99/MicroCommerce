@@ -76,7 +76,8 @@ namespace MCCustomers.Controllers
 
                 string jsonWebToken = token.Create(customer.Email);
 
-                //var refreshToken = GenerateRefreshToken();
+                RefreshToken refreshToken = new RefreshToken().Generate();
+                
                 //SetRefreshToken(refreshToken);
 
                 return Ok(jsonWebToken);
