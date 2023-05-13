@@ -1,6 +1,8 @@
-﻿namespace MCCustomers.Models.Dto
+﻿using MCCustomers.Interface;
+
+namespace MCCustomers.Models.Dto
 {
-    public class CustomerDto
+    public class CustomerDto : ICustomerCredentials
     {
         public string? Name { get; set; }
 
@@ -12,6 +14,6 @@
 
         public string? Password { get; set; }
         public byte[]? Image { get; set; }
-      
+
     }
 }
