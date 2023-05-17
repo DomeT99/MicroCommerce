@@ -75,11 +75,8 @@ namespace MCCustomers.Controllers
                 }
 
                 string jsonWebToken = token.Create(customer.Email);
-
-                RefreshToken refreshToken = new RefreshToken().Generate();
+                SetRefreshToken(customer.Email);
                 
-                //SetRefreshToken(refreshToken);
-
                 return Ok(jsonWebToken);
             }
             catch (Exception)
@@ -88,5 +85,14 @@ namespace MCCustomers.Controllers
             }
         }
 
+
+        private void SetRefreshToken(string email)
+        {
+
+            var refreshToken = new RefreshToken().Generate();
+            var cookieParams = new CookieParams().Generate(refreshToken.Expires);
+
+            Response.Cookies.Append("refreshToken", refreshToken.Token!, cookieParams);
+        }
     }
 }

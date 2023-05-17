@@ -1,13 +1,12 @@
-
 using System.Security.Cryptography;
 
 namespace MCCustomers.Utils
 {
     public class RefreshToken
     {
-        private string? Token { get; set; }
-        private DateTime Expires { get; set; }
-        private DateTime Created { get; set; } = DateTime.Now;
+        public string? Token { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime Expires { get; set; }
 
 
         public RefreshToken Generate()
@@ -16,6 +15,7 @@ namespace MCCustomers.Utils
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
                 Expires = DateTime.Now.AddDays(7),
+                Created = DateTime.Now
             };
 
             return refreshToken;
