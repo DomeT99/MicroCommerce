@@ -53,30 +53,23 @@ namespace MCCustomers.Controllers
 
             try
             {
-                var customer = Database.Customers
-                .Select(x => new Customer
-                {
-                    Email = x.Email,
-                    Password = x.Password
-                })
-                .Where(x => x.Email == credentials.Email)
-                .FirstOrDefault();
+                var customer = GetCustomerFromEmail(credentials.Email!);
 
 
-                if (customer!.Email != credentials.Email)
+                if (!IsSameEmail(customer!.Email, credentials.Email!))
                 {
                     return BadRequest("User not found");
                 }
 
 
-                if (!BCrypt.Net.BCrypt.Verify(credentials.Password, customer.Password))
+                if (!IsPassworEncrypt(credentials.Password!, customer.Password))
                 {
                     return BadRequest("Wrong password.");
                 }
 
                 string jsonWebToken = token.Create(customer.Email);
-                SetRefreshToken(customer.Email);
-                
+                SetRefreshToken();
+
                 return Ok(jsonWebToken);
             }
             catch (Exception)
@@ -86,7 +79,7 @@ namespace MCCustomers.Controllers
         }
 
 
-        private void SetRefreshToken(string email)
+        private void SetRefreshToken()
         {
 
             var refreshToken = new RefreshToken().Generate();
@@ -94,5 +87,27 @@ namespace MCCustomers.Controllers
 
             Response.Cookies.Append("refreshToken", refreshToken.Token!, cookieParams);
         }
+        private Customer GetCustomerFromEmail(string email)
+        {
+            var customer = Database.Customers
+                                   .Select(x => new Customer
+                                   {
+                                       Email = x.Email,
+                                       Password = x.Password
+                                   })
+                                   .Where(x => x.Email == email)
+                                   .FirstOrDefault();
+
+            return customer!;
+        }
+        private static bool IsSameEmail(string loginEmail, string dbEmail)
+        {
+            return loginEmail == dbEmail;
+        }
+        private static bool IsPassworEncrypt(string loginPassword, string dbPassword)
+        {
+            return BCrypt.Net.BCrypt.Verify(loginPassword, dbPassword);
+        }
+
     }
 }
