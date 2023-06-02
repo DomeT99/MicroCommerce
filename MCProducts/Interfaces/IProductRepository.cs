@@ -9,8 +9,8 @@ namespace MCProducts.Interfaces
         IEnumerable<Product> GetByName(string name);
         IEnumerable<Product> GetByCategory(string category);
         Product GetById(int id);
-        void UpdateQuantity(int id, int quantity);
         void Update(ProductDto product);
+        void UpdateQuantity(int id, int quantity);
         void Delete(int id);
     }
 }
