@@ -59,10 +59,54 @@ namespace MCProducts.Controllers
             }
         }
 
+        [HttpGet("category/{category}")]
+        public ActionResult GetByCategory(string category)
+        {
+            try
+            {
+                var products = _productRepository.GetByCategory(category);
+
+                if (IsEmpty(products))
+                {
+                    return NotFound();
+                }
+
+                return Ok(products);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult GetById(int id)
+        {
+            try
+            {
+                var product = _productRepository.GetById(id);
+
+                if (IsNull(product))
+                {
+                    return NotFound();
+                }
+
+                return Ok(product);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
 
         private static bool IsEmpty(IEnumerable<Product> products)
         {
             return !products.Any();
+        }
+        private static bool IsNull(Product product)
+        {
+            return product is null;
         }
     }
 }
