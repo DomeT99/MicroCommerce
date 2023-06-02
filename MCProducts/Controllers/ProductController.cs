@@ -25,8 +25,8 @@ namespace MCProducts.Controllers
             try
             {
                 var products = _productRepository.GetAll();
-                
-                if (products.Count() == 0)
+
+                if (IsEmpty(products))
                 {
                     return NotFound();
                 }
@@ -46,7 +46,7 @@ namespace MCProducts.Controllers
             {
                 var products = _productRepository.GetByName(name);
 
-                if(products.Count() == 0)
+                if (IsEmpty(products))
                 {
                     return NotFound();
                 }
@@ -57,6 +57,12 @@ namespace MCProducts.Controllers
             {
                 throw;
             }
+        }
+
+
+        private static bool IsEmpty(IEnumerable<Product> products)
+        {
+            return !products.Any();
         }
     }
 }
